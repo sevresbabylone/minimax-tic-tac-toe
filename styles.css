@@ -1,0 +1,26 @@
+.container {
+  background-color: #f8f8f8;
+  color: rgba(0,0,0,.54);
+  margin: -16px -16px;
+}
+.svg-box {
+  width: 100%;
+}
+svg {
+  width: 100%;
+  height: 250px;
+  background-color: #27bcac;
+}
+.tic-tac-toe-line {
+  stroke: #1ea092;
+  stroke-width: 7;
+  stroke-dasharray:200;
+  stroke-dashoffset:200;
+}
+
+@media (min-width: 700px) and (orientation: landscape) {
+  .svg-box {
+    width: 700px;
+    margin: 0 auto;
+  }
+}
