@@ -8,18 +8,18 @@ var cells = document.getElementsByClassName('tic-tac-toe-cell')
 var restartButton = document.querySelector('.restart-button')
 restartButton.addEventListener('click', function () {
   paths.forEach(function (path) {
-    redrawLine(path, '0')
+    redrawLine(path, '120')
     drawLine(path, '0')
     var symbols = document.querySelectorAll('.tic-tac-toe-cross-left, .tic-tac-toe-cross-right, .tic-tac-toe-nought')
     symbols.forEach(function (symbol) {
-      symbol.style.display = 'none'
+      redrawLine(symbol, '130')
     })
   })
 }, false)
 
-function redrawLine (element, timingDelay) {
+function redrawLine (element, offset) {
   element.style.display = 'none'
-  element.style.strokeDashoffset = '120'
+  element.style.strokeDashoffset = offset
 }
 function drawLine (element, timingDelay) {
   element.style.display = 'block'
