@@ -31,7 +31,7 @@
               <line class='tic-tac-toe-line' x1="159"  y1="120" x2="159"  y2="6" />
               <line class='tic-tac-toe-line' x1="159"  y1="120" x2="159"  y2="237" />
 
-              <line class='tic-tac-toe-line' x1="120"  y1="81" x2="0"  y2="81" />
+              <line class='tic-tac-toe-line' x1="120"  y1="81" x2="6"  y2="81" />
               <line class='tic-tac-toe-line' x1="120"  y1="81" x2="237"  y2="81" />
 
               <line class='tic-tac-toe-line' x1="120"  y1="159" x2="6"  y2="159" />
@@ -40,33 +40,91 @@
             <table>
               <tbody>
                 <tr>
-                  <td class="tic-tac-toe-cell">
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                      <line class="tic-tac-toe-cross" x1="15"  y1="15" x2="55"  y2="55" />
-                      <line class="tic-tac-toe-cross" x1="55"  y1="15" x2="15"  y2="55" />
-                    </svg>
-                  </td>
-                  <td class="tic-tac-toe-cell">
+                  <td class="tic-tac-toe-cell" position="0">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                       <line class="tic-tac-toe-cross-left" x1="15"  y1="15" x2="55"  y2="55" />
                       <line class="tic-tac-toe-cross-right" x1="55"  y1="15" x2="15"  y2="55" />
                     </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <circle class="tic-tac-toe-nought" id='shape' cx='34' cy='34' r='20'/>
+                    </svg>
                   </td>
-                  <td class="tic-tac-toe-cell">
+                  <td class="tic-tac-toe-cell" position="1">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <line class="tic-tac-toe-cross-left" x1="15"  y1="15" x2="55"  y2="55" />
+                      <line class="tic-tac-toe-cross-right" x1="55"  y1="15" x2="15"  y2="55" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <circle class="tic-tac-toe-nought" id='shape' cx='34' cy='34' r='20'/>
+                    </svg>
+                  </td>
+                  <td class="tic-tac-toe-cell" position="2">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <line class="tic-tac-toe-cross-left" x1="15"  y1="15" x2="55"  y2="55" />
+                      <line class="tic-tac-toe-cross-right" x1="55"  y1="15" x2="15"  y2="55" />
+                    </svg>
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                       <circle class="tic-tac-toe-nought" id='shape' cx='34' cy='34' r='20'/>
                     </svg>
                   </td>
                 </tr>
                 <tr>
-                  <td class="tic-tac-toe-cell"></td>
-                  <td class="tic-tac-toe-cell"></td>
-                  <td class="tic-tac-toe-cell"></td>
+                  <td class="tic-tac-toe-cell" position="3">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <line class="tic-tac-toe-cross-left" x1="15"  y1="15" x2="55"  y2="55" />
+                      <line class="tic-tac-toe-cross-right" x1="55"  y1="15" x2="15"  y2="55" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <circle class="tic-tac-toe-nought" id='shape' cx='34' cy='34' r='20'/>
+                    </svg>
+                  </td>
+                  <td class="tic-tac-toe-cell" position="4">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <line class="tic-tac-toe-cross-left" x1="15"  y1="15" x2="55"  y2="55" />
+                      <line class="tic-tac-toe-cross-right" x1="55"  y1="15" x2="15"  y2="55" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <circle class="tic-tac-toe-nought" id='shape' cx='34' cy='34' r='20'/>
+                    </svg>
+                  </td>
+                  <td class="tic-tac-toe-cell" position="5">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <line class="tic-tac-toe-cross-left" x1="15"  y1="15" x2="55"  y2="55" />
+                      <line class="tic-tac-toe-cross-right" x1="55"  y1="15" x2="15"  y2="55" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <circle class="tic-tac-toe-nought" id='shape' cx='34' cy='34' r='20'/>
+                    </svg>
+                  </td>
                 </tr>
                 <tr>
-                  <td class="tic-tac-toe-cell"></td>
-                  <td class="tic-tac-toe-cell"></td>
-                  <td class="tic-tac-toe-cell"></td>
+                  <td class="tic-tac-toe-cell" position="6">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <line class="tic-tac-toe-cross-left" x1="15"  y1="15" x2="55"  y2="55" />
+                      <line class="tic-tac-toe-cross-right" x1="55"  y1="15" x2="15"  y2="55" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <circle class="tic-tac-toe-nought" id='shape' cx='34' cy='34' r='20'/>
+                    </svg>
+                  </td>
+                  <td class="tic-tac-toe-cell" position="7">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <line class="tic-tac-toe-cross-left" x1="15"  y1="15" x2="55"  y2="55" />
+                      <line class="tic-tac-toe-cross-right" x1="55"  y1="15" x2="15"  y2="55" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <circle class="tic-tac-toe-nought" id='shape' cx='34' cy='34' r='20'/>
+                    </svg>
+                  </td>
+                  <td class="tic-tac-toe-cell" position="8">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <line class="tic-tac-toe-cross-left" x1="15"  y1="15" x2="55"  y2="55" />
+                      <line class="tic-tac-toe-cross-right" x1="55"  y1="15" x2="15"  y2="55" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                      <circle class="tic-tac-toe-nought" id='shape' cx='34' cy='34' r='20'/>
+                    </svg>
+                  </td>
                 </tr>
               </tbody>
             </table>
