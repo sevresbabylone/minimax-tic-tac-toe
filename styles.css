@@ -84,16 +84,3 @@ button.restart-button {
     width: 700px;
   }
 }
-
-@keyframes my-animation {
-  from {
-    stroke-dashoffset: 114;
-  }
-  to {
-    stroke-dashoffset : 0;
-  }
-}
-
-.run-animation {
-  animation: my-animation 0.4s ease;
-}
