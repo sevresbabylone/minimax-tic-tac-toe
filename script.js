@@ -9,7 +9,7 @@ window.document.addEventListener('DOMContentLoaded', function () {
   var ticTacToeTable = document.querySelector('.tic-tac-toe-table')
   var displayMessage = document.querySelector('.display-message')
   var displayWinnerMessage = document.querySelector('.display-winner')
-  var displayDrawMessage = document.querySelector('.display-winner')
+  var displayDrawMessage = document.querySelector('.display-draw')
 
   var WINNING_COMBINATIONS = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6],
                               [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
@@ -44,12 +44,10 @@ window.document.addEventListener('DOMContentLoaded', function () {
   var board = [null, null, null, null, null, null, null, null]
   var currentPlayer = 'x'
   var currentNoOfTurns = 1
+  var mode = 1
 
-  newBoard()
+  drawBoard()
 
-  paths.forEach(function (path) {
-    drawLine(path, '0')
-  })
   restartButton.addEventListener('click', function () {
     drawBoard()
   }, false)
@@ -112,6 +110,13 @@ window.document.addEventListener('DOMContentLoaded', function () {
       newBoard()
     })
   }
+  function shrinkTable () {
+    ticTacToeTable.transition = ticTacToeTable.style.WebkitTransition = 'none'
+    ticTacToeTable.getBoundingClientRect()
+    ticTacToeTable.style.transition = ticTacToeTable.style.WebkitTransition =
+      'all 0.6s ease'
+    ticTacToeTable.style.webkitTransform += 'scale(0.5)'
+  }
   function displayWinner (winningCombination, winner, winningCombinationIndex) {
     // Display a stroke through winning combination
     var strikeThrough = window.document.createElementNS('http://www.w3.org/2000/svg', 'line')
@@ -143,17 +148,13 @@ window.document.addEventListener('DOMContentLoaded', function () {
     })
     // tic tac toe grid shrinks and disappears
     window.setTimeout(function () {
+      shrinkTable()
       ticTacToeBoard.transition = ticTacToeBoard.style.WebkitTransition = 'none'
       ticTacToeBoard.getBoundingClientRect()
       ticTacToeBoard.style.transition = ticTacToeBoard.style.WebkitTransition =
         'all 0.6s ease'
       ticTacToeBoard.style.opacity = '0'
       ticTacToeBoard.style.webkitTransform += 'scale(0.5)'
-      ticTacToeTable.transition = ticTacToeTable.style.WebkitTransition = 'none'
-      ticTacToeTable.getBoundingClientRect()
-      ticTacToeTable.style.transition = ticTacToeTable.style.WebkitTransition =
-        'all 0.6s ease'
-      ticTacToeTable.style.webkitTransform += 'scale(0.5)'
       Array.prototype.forEach.call(cells, function (cell, index) {
         if (index !== winningCombination[1]) {
           cell.style.opacity = 0
@@ -163,8 +164,8 @@ window.document.addEventListener('DOMContentLoaded', function () {
       // display another SVG text saying WINNER! below it
       cells[winningCombination[1]].style.webkitTransform += 'scale(4.5) translateY(-10px)'
       displayWinnerMessage.style.display = 'block'
-      displayMessage.transition = displayWinnerMessage.style.WebkitTransition = 'none'
-      displayMessage.style.transition = ticTacToeBoard.style.WebkitTransition =
+      displayWinnerMessage.transition = displayWinnerMessage.style.WebkitTransition = 'none'
+      displayMessage.style.transition = displayMessage.style.WebkitTransition =
         'all 0.6s ease'
       displayMessage.style.opacity = '1'
       displayMessage.style.webkitTransform += 'translateY(-60px)'
@@ -183,8 +184,36 @@ window.document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  function displayDraw() {
-    
+  function displayDraw () {
+    window.setTimeout(function () {
+      shrinkTable()
+      ticTacToeBoard.transition = ticTacToeBoard.style.WebkitTransition = 'none'
+      ticTacToeBoard.getBoundingClientRect()
+      ticTacToeBoard.style.transition = ticTacToeBoard.style.WebkitTransition =
+        'all 0.6s ease'
+      ticTacToeBoard.style.opacity = '0'
+      ticTacToeBoard.style.webkitTransform += 'scale(0.5)'
+      // In all possible draws for Tic tac toe, position 3 and 5 are always different,
+      // these two cells are used as part of the draw message
+      var crossDrawIndex = 3
+      var noughtDrawIndex = 5
+      Array.prototype.forEach.call(cells, function (cell, index) {
+        if (index !== crossDrawIndex && index !== noughtDrawIndex) {
+          cell.style.opacity = 0
+        }
+      })
+
+      displayDrawMessage.style.display = 'block'
+      displayDrawMessage.transition = displayWinnerMessage.style.WebkitTransition = 'none'
+      displayMessage.style.transition = displayMessage.style.WebkitTransition =
+        'all 0.6s ease'
+      displayMessage.style.opacity = '1'
+      displayMessage.style.webkitTransform += 'translateY(-60px)'
+      var drawCells = [noughtDrawIndex, crossDrawIndex]
+      drawCells.forEach(function (drawCellIndex) {
+        cells[drawCellIndex].style.webkitTransform += 'translateX(' + DISTANCES_FROM_CENTRE[drawCellIndex].left / 4 + 'px)' + ' scale(2.5)'
+      })
+    }, 1500)
   }
 
   function removeEventListenersFromCells () {
@@ -205,17 +234,19 @@ window.document.addEventListener('DOMContentLoaded', function () {
     displayMessage.style.webkitTransform = null
     window.setTimeout(function () {
       displayWinnerMessage.style.display = 'none'
+      displayDrawMessage.style.display = 'none'
     }, 200)
     var winningCells = document.getElementsByClassName('winning-cell')
     Array.prototype.forEach.call(winningCells, function (winningCell) {
-      winningCell.style.webkitTransform = null
       winningCell.classList.remove('winning-cell')
     })
     Array.prototype.forEach.call(cells, function (cell) {
       cell.style.opacity = null
+      cell.style.webkitTransform = null
       cell.addEventListener('click', addMove, { once: true })
     })
   }
+
   function addMove (event) {
     var position = event.currentTarget.getAttribute('position')
     if (currentPlayer === 'x') {
@@ -247,6 +278,7 @@ window.document.addEventListener('DOMContentLoaded', function () {
       removeEventListenersFromCells()
       displayWinner(WINNING_COMBINATIONS[winningCombination], board[WINNING_COMBINATIONS[winningCombination][0]], winningCombination)
     } else if (currentNoOfTurns === 9) {
+      displayDraw()
     }
   }
 })
