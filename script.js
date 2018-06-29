@@ -7,28 +7,31 @@ window.document.addEventListener('DOMContentLoaded', function () {
   var restartButton = document.querySelector('.restart-button')
   var ticTacToeBoard = document.querySelector('.tic-tac-toe')
   var ticTacToeTable = document.querySelector('.tic-tac-toe-table')
+  var displayMessage = document.querySelector('.display-message')
+  var displayWinnerMessage = document.querySelector('.display-winner')
+  var displayDrawMessage = document.querySelector('.display-winner')
 
   var WINNING_COMBINATIONS = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6],
                               [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
-                              var DISTANCES_FROM_CENTRE = [{ top: 78, left: 78 },
-                                                           { top: 78, left: 0 },
-                                                           { top: 78, left: -78 },
-                                                           { top: 0, left: 78 },
-                                                           { top: 0, left: 0 },
-                                                           { top: 0, left: -78 },
-                                                           { top: -78, left: 78 },
-                                                           { top: -78, left: 0 },
-                                                           { top: -78, left: -78 }]
+  var DISTANCES_FROM_CENTRE = [{ top: 78, left: 78 },
+                               { top: 78, left: 0 },
+                               { top: 78, left: -78 },
+                               { top: 0, left: 78 },
+                               { top: 0, left: 0 },
+                               { top: 0, left: -78 },
+                               { top: -78, left: 78 },
+                               { top: -78, left: 0 },
+                               { top: -78, left: -78 }]
 
-                            var STRIKETHROUGH_DISTANCES_FROM_CENTRE = [{ top: 78, left: 0 },
-                                                                       { top: 0, left: 0 },
-                                                                       { top: -78, left: -0 },
-                                                                       { top: 0, left: 78 },
-                                                                       { top: 0, left: 0 },
-                                                                       { top: 0, left: -78 },
-                                                                       { top: -78, left: 78 },
-                                                                       { top: 0, left: 0 },
-                                                                       { top: 0, left: 0 }]
+  var STRIKETHROUGH_DISTANCES_FROM_CENTRE = [{ top: 78, left: 0 },
+                                             { top: 0, left: 0 },
+                                             { top: -78, left: -0 },
+                                             { top: 0, left: 78 },
+                                             { top: 0, left: 0 },
+                                             { top: 0, left: -78 },
+                                             { top: -78, left: 78 },
+                                             { top: 0, left: 0 },
+                                             { top: 0, left: 0 }]
 
   var STRIKETHROUGH_COORDINATES = [{x1: '6', y1: '42', x2: '234', y2: '42'},
                                    {x1: '6', y1: '120', x2: '234', y2: '120'},
@@ -80,7 +83,7 @@ window.document.addEventListener('DOMContentLoaded', function () {
     element.getBoundingClientRect()
     element.style.transition = element.style.WebkitTransition =
       'all 0.4s ease'
-    // element.style.transitionDelay = timingDelay
+
     element.style.webkitTransform += 'translate(' + STRIKETHROUGH_DISTANCES_FROM_CENTRE[winningCombinationIndex].left +
     'px,' + STRIKETHROUGH_DISTANCES_FROM_CENTRE[winningCombinationIndex].top + 'px)'
     element.style.strokeDasharray = dashArraySize + ' ' + dashArrayGap
@@ -156,7 +159,15 @@ window.document.addEventListener('DOMContentLoaded', function () {
           cell.style.opacity = 0
         }
       })
-      cells[winningCombination[1]].style.webkitTransform += 'scale(3.5)'
+      // winning display moves up a little
+      // display another SVG text saying WINNER! below it
+      cells[winningCombination[1]].style.webkitTransform += 'scale(4.5) translateY(-10px)'
+      displayWinnerMessage.style.display = 'block'
+      displayMessage.transition = displayWinnerMessage.style.WebkitTransition = 'none'
+      displayMessage.style.transition = ticTacToeBoard.style.WebkitTransition =
+        'all 0.6s ease'
+      displayMessage.style.opacity = '1'
+      displayMessage.style.webkitTransform += 'translateY(-60px)'
     }, 1500)
 
       // Stroke shrinks inwards towards central cell of winning combination
@@ -170,10 +181,11 @@ window.document.addEventListener('DOMContentLoaded', function () {
         shrinkLine(strikeThrough, '0.4s', winningCombinationIndex, '-110', '0', '400')
       }, 1000)
     }
-    // central winning piece becomes bigger, other pieces board become smaller until they fade out
-    // display another SVG text saying WINNER! on top of it
+  }
 
-}
+  function displayDraw() {
+    
+  }
 
   function removeEventListenersFromCells () {
     Array.prototype.forEach.call(cells, function (cell) {
@@ -188,6 +200,12 @@ window.document.addEventListener('DOMContentLoaded', function () {
     ticTacToeBoard.style.opacity = '1'
     ticTacToeTable.style.opacity = '1'
     ticTacToeTable.style.webkitTransform = null
+
+    displayMessage.style.opacity = '0'
+    displayMessage.style.webkitTransform = null
+    window.setTimeout(function () {
+      displayWinnerMessage.style.display = 'none'
+    }, 200)
     var winningCells = document.getElementsByClassName('winning-cell')
     Array.prototype.forEach.call(winningCells, function (winningCell) {
       winningCell.style.webkitTransform = null

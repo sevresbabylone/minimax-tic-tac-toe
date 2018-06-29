@@ -67,6 +67,23 @@ svg.tic-tac-toe {
   height: 72px;
   position: absolute;
 }
+svg.display-message {
+  width: 180px;
+  height: 40px;
+  z-index: 2;
+  opacity: 0;
+  position: absolute;
+  top: 250px;
+  left: 32px;
+}
+.display {
+  fill: #545454;
+  font-family: 'Roboto';
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: 36px;
+  display: none;
+}
 button.restart-button {
   font-size: 16px;
   letter-spacing: 0.6px;
