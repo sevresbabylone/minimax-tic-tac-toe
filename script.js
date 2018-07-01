@@ -10,6 +10,8 @@ window.document.addEventListener('DOMContentLoaded', function () {
   var displayMessage = document.querySelector('.display-message')
   var displayWinnerMessage = document.querySelector('.display-winner')
   var displayDrawMessage = document.querySelector('.display-draw')
+  var playerOptions = document.getElementsByClassName('player-option')
+  var mask = document.querySelector('.mask')
 
   var WINNING_COMBINATIONS = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6],
                               [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
@@ -43,8 +45,8 @@ window.document.addEventListener('DOMContentLoaded', function () {
                                    {x1: '234', y1: '6', x2: '6', y2: '234'}]
   var board = [null, null, null, null, null, null, null, null]
   var currentPlayer = 'x'
-  var currentNoOfTurns = 1
-  var mode = 1
+  var currentNoOfTurns = 0
+  var mode = '1'
 
   drawBoard()
 
@@ -52,6 +54,12 @@ window.document.addEventListener('DOMContentLoaded', function () {
     drawBoard()
   }, false)
 
+  Array.prototype.forEach.call(playerOptions, function (playerOptions) {
+    playerOptions.addEventListener('click', function (event) {
+      mode = event.target.getAttribute('value')
+      drawBoard()
+    })
+  })
   function redrawLine (element, offset) {
     element.style.display = 'none'
     element.style.strokeDashoffset = offset
@@ -68,7 +76,6 @@ window.document.addEventListener('DOMContentLoaded', function () {
 
   function shrinkDiagonalLine (element, offset, dashArraySize, dashArrayGap, timingDelay) {
     element.transition = element.style.WebkitTransition = 'none'
-    element.getBoundingClientRect()
     element.style.transition = element.style.WebkitTransition =
       'all 0.4s ease'
     element.style.transitionDelay = timingDelay
@@ -78,7 +85,6 @@ window.document.addEventListener('DOMContentLoaded', function () {
 
   function shrinkLine (element, timingDelay, winningCombinationIndex, offset, dashArraySize, dashArrayGap) {
     element.transition = element.style.WebkitTransition = 'none'
-    element.getBoundingClientRect()
     element.style.transition = element.style.WebkitTransition =
       'all 0.4s ease'
 
@@ -138,7 +144,6 @@ window.document.addEventListener('DOMContentLoaded', function () {
     winningCombination.forEach(function (winningCellIndex) {
       var winningCell = cells[winningCellIndex]
       winningCell.transition = winningCell.style.WebkitTransition = 'none'
-      winningCell.getBoundingClientRect()
       winningCell.style.transition = winningCell.style.WebkitTransition = 'all 0.35s ease'
       window.setTimeout(function () {
         winningCell.classList.add('winning-cell')
@@ -150,7 +155,6 @@ window.document.addEventListener('DOMContentLoaded', function () {
     window.setTimeout(function () {
       shrinkTable()
       ticTacToeBoard.transition = ticTacToeBoard.style.WebkitTransition = 'none'
-      ticTacToeBoard.getBoundingClientRect()
       ticTacToeBoard.style.transition = ticTacToeBoard.style.WebkitTransition =
         'all 0.6s ease'
       ticTacToeBoard.style.opacity = '0'
@@ -188,7 +192,6 @@ window.document.addEventListener('DOMContentLoaded', function () {
     window.setTimeout(function () {
       shrinkTable()
       ticTacToeBoard.transition = ticTacToeBoard.style.WebkitTransition = 'none'
-      ticTacToeBoard.getBoundingClientRect()
       ticTacToeBoard.style.transition = ticTacToeBoard.style.WebkitTransition =
         'all 0.6s ease'
       ticTacToeBoard.style.opacity = '0'
@@ -202,7 +205,6 @@ window.document.addEventListener('DOMContentLoaded', function () {
           cell.style.opacity = 0
         }
       })
-
       displayDrawMessage.style.display = 'block'
       displayDrawMessage.transition = displayWinnerMessage.style.WebkitTransition = 'none'
       displayMessage.style.transition = displayMessage.style.WebkitTransition =
@@ -219,12 +221,13 @@ window.document.addEventListener('DOMContentLoaded', function () {
   function removeEventListenersFromCells () {
     Array.prototype.forEach.call(cells, function (cell) {
       cell.removeEventListener('click', addMove)
+      cell.removeEventListener('click', addMoveMinimax)
     })
   }
   function newBoard () {
     board = [null, null, null, null, null, null, null, null]
     currentPlayer = 'x'
-    currentNoOfTurns = 1
+    currentNoOfTurns = 0
     ticTacToeBoard.style.webkitTransform = null
     ticTacToeBoard.style.opacity = '1'
     ticTacToeTable.style.opacity = '1'
@@ -240,11 +243,20 @@ window.document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(winningCells, function (winningCell) {
       winningCell.classList.remove('winning-cell')
     })
-    Array.prototype.forEach.call(cells, function (cell) {
-      cell.style.opacity = null
-      cell.style.webkitTransform = null
-      cell.addEventListener('click', addMove, { once: true })
-    })
+    removeEventListenersFromCells()
+    if (mode === '1') {
+      Array.prototype.forEach.call(cells, function (cell) {
+        cell.style.opacity = null
+        cell.style.webkitTransform = null
+        cell.addEventListener('click', addMove, { once: true })
+      })
+    } else {
+      Array.prototype.forEach.call(cells, function (cell) {
+        cell.style.opacity = null
+        cell.style.webkitTransform = null
+        cell.addEventListener('click', addMoveMinimax, { once: true })
+      })
+    }
   }
 
   function addMove (event) {
@@ -256,9 +268,27 @@ window.document.addEventListener('DOMContentLoaded', function () {
       drawNought(circles[position])
       board[position] = 'o'
     }
+    currentNoOfTurns = currentNoOfTurns + 1
     checkWin()
-    ++currentNoOfTurns
     switchPlayer()
+  }
+
+  function addMoveMinimax (event) {
+    var position = event.currentTarget.getAttribute('position')
+    drawCross(crossesLeft[position], crossesRight[position])
+    board[position] = 'x'
+    mask.style.display = 'block'
+    currentNoOfTurns = currentNoOfTurns + 1
+    if (checkWin()) {
+      mask.style.display = 'none'
+      return
+    }
+    var bestMove = findBestMove()
+    board[bestMove] = 'o'
+    drawNought(circles[bestMove])
+    currentNoOfTurns = currentNoOfTurns + 1
+    checkWin()
+    mask.style.display = 'none'
   }
 
   function switchPlayer () {
@@ -280,5 +310,65 @@ window.document.addEventListener('DOMContentLoaded', function () {
     } else if (currentNoOfTurns === 9) {
       displayDraw()
     }
+    return isWon
+  }
+  function evaluate (depth) {
+    var potentialWinningCombination
+    var isWon = WINNING_COMBINATIONS.some(function (combination, index) {
+      potentialWinningCombination = index
+      return board[combination[0]] === board[combination[1]] &&
+             board[combination[1]] === board[combination[2]] &&
+             board[combination[0]] !== null
+    })
+    if (isWon) {
+      if (board[WINNING_COMBINATIONS[potentialWinningCombination][0]] === 'o') return 10 - depth
+      console.log('in isWon')
+      return -10 + depth
+    }
+    return 0
+  }
+  function minimax (depth, isMaximisingPlayer) {
+    var score = evaluate(depth)
+    if (score !== 0) return score
+    if (!board.includes(null)) return 0
+    if (isMaximisingPlayer) {
+      var maxValue = -10000
+      board.forEach(function (cellValue, cellIndex) {
+        if (cellValue === null) {
+          board[cellIndex] = 'o'
+          var cellScore = minimax(depth + 1, false)
+          maxValue = maxValue < cellScore ? cellScore : maxValue
+          board[cellIndex] = null
+        }
+      })
+      return maxValue
+    } else {
+      var minValue = 10000
+      board.forEach(function (cellValue, cellIndex) {
+        if (cellValue === null) {
+          board[cellIndex] = 'x'
+          var cellScore = minimax(depth + 1, true)
+          minValue = minValue > cellScore ? cellScore : minValue
+          board[cellIndex] = null
+        }
+      })
+      return minValue
+    }
+  }
+  function findBestMove () {
+    var maxValue = -10000
+    var maxCellIndex = null
+    board.forEach(function (cellValue, cellIndex) {
+      if (cellValue === null) {
+        board[cellIndex] = 'o'
+        var cellScore = minimax(0, false)
+        if (maxValue < cellScore) {
+          maxValue = cellScore
+          maxCellIndex = cellIndex
+        }
+        board[cellIndex] = null
+      }
+    })
+    return maxCellIndex
   }
 })

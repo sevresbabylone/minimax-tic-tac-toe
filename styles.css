@@ -92,7 +92,14 @@ button.restart-button {
   font-weight: bold;
   height: 50px;
 }
-
+.mask {
+  width: 240px;
+  height: 240px;
+  opacity: 0.5;
+  position: absolute;
+  z-index: 5;
+  display: none;
+}
 @media (min-width: 700px) and (orientation: landscape) {
   .svg-box {
     margin: 0 auto;
