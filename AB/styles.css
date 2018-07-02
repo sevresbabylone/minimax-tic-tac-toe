@@ -1,0 +1,110 @@
+table {
+  z-index: 3;
+  width: 240px;
+  height: 240px;
+  border-collapse: seperate;
+  border-spacing: 6px;
+}
+
+td {
+  display: table-cell;
+  box-sizing: border-box;
+  border: 0;
+  height: 72px;
+  width: 72px;
+  position: relative;
+  vertical-align: top;
+}
+
+.container {
+  background-color: #f8f8f8;
+  margin: 0 auto;
+  color: rgba(0,0,0,.54);
+}
+.svg-box__container {
+  width: 100%;
+  background-color: #27bcac;
+}
+.svg-box {
+  width: 240px;
+  padding: 20px 0;
+  position: relative;
+  margin: 0 auto;
+}
+svg.tic-tac-toe-grid {
+  width: 240px;
+  height: 240px;
+  position: absolute;
+}
+.tic-tac-toe-line {
+  stroke: #1ea092;
+  stroke-width: 6;
+  stroke-dasharray:120;
+  stroke-dashoffset:120;
+}
+
+.tic-tac-toe-cross-left, .tic-tac-toe-cross-right {
+  display: none;
+  stroke: #545454;
+  stroke-width: 6;
+  stroke-dasharray:130;
+  stroke-dashoffset:130;
+}
+.tic-tac-toe-nought {
+  display: none;
+  stroke: #f2ebd4;
+  stroke-width: 6;
+  fill: none;
+  stroke-dasharray:130;
+  stroke-dashoffset:130;
+}
+.tic-tac-toe-cell {
+  position: relative;
+  cursor: pointer;
+}
+.tic-tac-toe-cell svg {
+  width: 72px;
+  height: 72px;
+  position: absolute;
+}
+svg.display-message {
+  width: 180px;
+  height: 40px;
+  z-index: 2;
+  opacity: 0;
+  position: absolute;
+  top: 250px;
+  left: 32px;
+}
+.display {
+  fill: #545454;
+  font-family: 'Roboto';
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: 36px;
+  display: none;
+}
+button.restart-button {
+  font-size: 16px;
+  letter-spacing: 0.6px;
+  color:  #27bcac;
+  cursor: pointer;
+  font-weight: bold;
+  height: 50px;
+}
+.mask {
+  width: 240px;
+  height: 240px;
+  opacity: 0.5;
+  position: absolute;
+  z-index: 5;
+  display: none;
+}
+@media (min-width: 700px) and (orientation: landscape) {
+  .svg-box {
+    margin: 0 auto;
+  }
+  .container {
+    width: 700px;
+  }
+}

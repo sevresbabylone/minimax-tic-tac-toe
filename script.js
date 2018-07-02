@@ -10,7 +10,6 @@ window.document.addEventListener('DOMContentLoaded', function () {
   var displayMessage = document.querySelector('.display-message')
   var displayWinnerMessage = document.querySelector('.display-winner')
   var displayDrawMessage = document.querySelector('.display-draw')
-  var playerOptions = document.getElementsByClassName('player-option')
   var mask = document.querySelector('.mask')
 
   var WINNING_COMBINATIONS = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6],
@@ -46,7 +45,7 @@ window.document.addEventListener('DOMContentLoaded', function () {
   var board = [null, null, null, null, null, null, null, null]
   var currentPlayer = 'x'
   var currentNoOfTurns = 0
-  var mode = '1'
+  var mode = '2'
 
   drawBoard()
 
@@ -54,12 +53,12 @@ window.document.addEventListener('DOMContentLoaded', function () {
     drawBoard()
   }, false)
 
-  Array.prototype.forEach.call(playerOptions, function (playerOptions) {
-    playerOptions.addEventListener('click', function (event) {
-      mode = event.target.getAttribute('value')
-      drawBoard()
-    })
-  })
+  window.document.getElementsByClassName('player-options').addEventListener('click', function (event) {
+   if (event.target && event.target.nodeName === 'li') {
+     event.target.getAttribute('value')
+   }
+ })
+
   function redrawLine (element, offset) {
     element.style.display = 'none'
     element.style.strokeDashoffset = offset
@@ -94,13 +93,13 @@ window.document.addEventListener('DOMContentLoaded', function () {
     element.style.strokeDashoffset = offset
   }
 
-  function drawCross (leftStroke, rightStroke) {
-    drawLine(leftStroke, '0')
-    drawLine(rightStroke, '0.3s')
-  }
-  function drawNought (circle) {
-    drawLine(circle, '0')
-  }
+  // function drawCross (leftStroke, rightStroke) {
+  //   drawLine(leftStroke, '0')
+  //   drawLine(rightStroke, '0.3s')
+  // }
+  // function drawNought (circle) {
+  //   drawLine(circle, '0')
+  // }
   function drawBoard () {
     paths.forEach(function (path) {
       redrawLine(path, '120')
@@ -196,8 +195,6 @@ window.document.addEventListener('DOMContentLoaded', function () {
         'all 0.6s ease'
       ticTacToeBoard.style.opacity = '0'
       ticTacToeBoard.style.webkitTransform += 'scale(0.5)'
-      // In all possible draws for Tic tac toe, position 3 and 5 are always different,
-      // these two cells are used as part of the draw message
       var crossDrawIndex = 3
       var noughtDrawIndex = 5
       Array.prototype.forEach.call(cells, function (cell, index) {
@@ -312,24 +309,29 @@ window.document.addEventListener('DOMContentLoaded', function () {
     }
     return isWon
   }
-  function evaluate (depth) {
-    var potentialWinningCombination
+  function evaluate () {
+    var winningCombinationIndex
     var isWon = WINNING_COMBINATIONS.some(function (combination, index) {
-      potentialWinningCombination = index
+      winningCombinationIndex = index
       return board[combination[0]] === board[combination[1]] &&
              board[combination[1]] === board[combination[2]] &&
              board[combination[0]] !== null
     })
     if (isWon) {
-      if (board[WINNING_COMBINATIONS[potentialWinningCombination][0]] === 'o') return 10 - depth
-      console.log('in isWon')
-      return -10 + depth
+
+      if (board[WINNING_COMBINATIONS[winningCombinationIndex][0]] === 'o') {
+        return 10
+      }
+      if (board[WINNING_COMBINATIONS[winningCombinationIndex][0]] === 'x') {
+        return -10
+      }
     }
     return 0
   }
   function minimax (depth, isMaximisingPlayer) {
-    var score = evaluate(depth)
-    if (score !== 0) return score
+    var score = evaluate()
+    if (score === 10) return score - depth
+    if (score === -10) return score + depth
     if (!board.includes(null)) return 0
     if (isMaximisingPlayer) {
       var maxValue = -10000
@@ -337,7 +339,9 @@ window.document.addEventListener('DOMContentLoaded', function () {
         if (cellValue === null) {
           board[cellIndex] = 'o'
           var cellScore = minimax(depth + 1, false)
-          maxValue = maxValue < cellScore ? cellScore : maxValue
+          if (maxValue < cellScore) {
+            maxValue = cellScore
+          }
           board[cellIndex] = null
         }
       })
@@ -348,7 +352,9 @@ window.document.addEventListener('DOMContentLoaded', function () {
         if (cellValue === null) {
           board[cellIndex] = 'x'
           var cellScore = minimax(depth + 1, true)
-          minValue = minValue > cellScore ? cellScore : minValue
+          if (minValue > cellScore) {
+            minValue = cellScore
+          }
           board[cellIndex] = null
         }
       })
@@ -356,19 +362,20 @@ window.document.addEventListener('DOMContentLoaded', function () {
     }
   }
   function findBestMove () {
-    var maxValue = -10000
-    var maxCellIndex = null
+    var bestValue = -10000
+    var bestCellIndex = null
     board.forEach(function (cellValue, cellIndex) {
       if (cellValue === null) {
         board[cellIndex] = 'o'
-        var cellScore = minimax(0, false)
-        if (maxValue < cellScore) {
-          maxValue = cellScore
-          maxCellIndex = cellIndex
+        var bestCellScore = minimax(0, false)
+        if (bestValue < bestCellScore) {
+          bestValue = bestCellScore
+          bestCellIndex = cellIndex
         }
+        console.log(bestCellScore)
         board[cellIndex] = null
       }
     })
-    return maxCellIndex
+    return bestCellIndex
   }
 })
