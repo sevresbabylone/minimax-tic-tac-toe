@@ -1,7 +1,8 @@
 (function () {
   window.document.addEventListener('DOMContentLoaded', function () {
     // Variables for animation purposes
-    var WINNING_COMBINATIONS = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6],
+    var WINNING_COMBINATIONS, LINES
+    WINNING_COMBINATIONS = LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6],
                                 [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
     var DISTANCES_FROM_CENTRE = [{ top: 78, left: 78 },
                                  { top: 78, left: 0 },
@@ -31,6 +32,7 @@
                                      {x1: '198', y1: '6', x2: '198', y2: '234'},
                                      {x1: '6', y1: '6', x2: '234', y2: '234'},
                                      {x1: '234', y1: '6', x2: '6', y2: '234'}]
+
     var lines = document.querySelectorAll('.tic-tac-toe-line')
     var ticTacToeCellTable = document.querySelector('.tic-tac-toe-cell-table')
     var ticTacToeGrid = document.querySelector('.tic-tac-toe-grid')
@@ -59,7 +61,9 @@
       this.currentPlayer = 'x'
       this.mode = mode
       this.currentNoOfTurns = 0
+      this.isGameOver = false
     }
+    Game.INFINITY = 100000
     Game.prototype.addMove = function (cellIndex) {
       if (this.currentPlayer === 'x') {
         this.board[cellIndex] = 'x'
@@ -72,9 +76,11 @@
       this.switchPlayer()
       var checkWin = this.checkWin()
       if (checkWin.isWon) {
+        this.isGameOver = true
         displayWinner(checkWin.winningCombinationIndex)
       }
       if (this.isDraw()) {
+        this.isGameOver = true
         displayDraw()
       }
     }
@@ -99,16 +105,64 @@
     Game.prototype.getBestMove = function () {
 
     }
-    Game.prototype.evaluateMove = function () {
-
+    Game.prototype.evaluate = function () {
+     /* Heuristic evaluation function for the current board
+      +100, +10, +1 for EACH 3-, 2-, 1-in-a-line for maximiser.
+      -100, -10, -1 for EACH 3-, 2-, 1-in-a-line for minimiser.
+      0 otherwise */
+      var self = this
+      return LINES.reduce(function (score, LINE) {
+        return score + self.evaluateLine(LINE)
+      }, 0)
     }
+    Game.prototype.evaluateLine = function (line) {
+      var score = 0
+      // TODO: make it possible for either 'x' or 'o' to be maximiser
+      /* Heuristic evaluation function for the given line of 3 cells
+        +100, +10, +1 for 3-, 2-, 1-in-a-line for maximiser
+        -100, -10, -1 for 3-, 2-, 1-in-a-line for minimiser
+        0 otherwise */
+
+      if (line[0] === 'o') score = 1 // o ? ? 1 in-a-line
+      else if (line[0] === 'x') score = -1 // x ? ? 1 in-a-line
+
+      if (line[1] === 'o') {
+        if (score === 1) score = 10 // o o ? 2 in-a-line
+        else if (score === -1) return 0 // x o ?
+        else score = 1 // - o ?
+      }
+      if (line[1] === 'x') {
+        if (score === -1) score = -10 // x x ? 2 in-a-line
+        else if (score === 1) return 0 // o x ?
+        else score = -1 // - x ?
+      }
+      if (line[2] === 'o') {
+        if (score > 0) score *= 10 //  - - o, o - o, - o o, o o o
+        if (score < 0) return 0 // x x o, o x o, - x o, x - o, x o o
+        else score = 1 // - - o
+      }
+      if (line[2] === 'x') {
+        if (score < 0) score *= 10
+        if (score > 0) return 0
+        else score = -1 // - - x
+      }
+      return score
+    }
+
     Game.prototype.minimax = function (depth, isMaximisingPlayer) {
-      var bestScore = isMaximisingPlayer ? -10000 : 10000
-      if (true) { // base case
+      var bestScore = isMaximisingPlayer ? -this.INFINITY : this.INFINITY
+      var bestScoreIndex
+      if (this.isDraw() || this.checkWin().isWon || depth === 0) {
+        // base case: Game over or depth reached, evaluate score
+        bestScore = this.evaluate()
+      }
+      if (isMaximisingPlayer) {
+
+      } else {
 
       }
-    }
-
+      // undo move
+      return { bestScore: bestScore, bestScoreIndex: bestScoreIndex }
     }
 
   // Functions that handle SVG Animation
@@ -285,6 +339,7 @@
     function addMinimaxMove (event) {
       addMove(event)
       // there needs to be a time delay here
+      if (session.game.isGameOver) return
       var bestMoveIndex = session.game.getBestMove()
       session.game.board[bestMoveIndex] = session.game.currentPlayer
       if (session.game.currentPlayer === 'o') drawNought(bestMoveIndex)
