@@ -96,6 +96,20 @@
     Game.prototype.isDraw = function () {
       return !this.board.includes(null)
     }
+    Game.prototype.getBestMove = function () {
+
+    }
+    Game.prototype.evaluateMove = function () {
+
+    }
+    Game.prototype.minimax = function (depth, isMaximisingPlayer) {
+      var bestScore = isMaximisingPlayer ? -10000 : 10000
+      if (true) { // base case
+
+      }
+    }
+
+    }
 
   // Functions that handle SVG Animation
     function drawNewBoard (game) {
@@ -116,7 +130,11 @@
         resetsLine(line, '120')
         drawLine(line, '0')
       })
-      ticTacToeCellTable.addEventListener('click', addMove)
+      if (session.game.mode === '1') {
+        ticTacToeCellTable.addEventListener('click', addMove)
+      } else {
+        ticTacToeCellTable.addEventListener('click', addMinimaxMove)
+      }
       var symbols = document.querySelectorAll('.tic-tac-toe-cross-left, .tic-tac-toe-cross-right, .tic-tac-toe-nought')
       symbols.forEach(function (symbol) {
         resetsLine(symbol, '130')
@@ -263,6 +281,15 @@
           session.game.addMove(selectedCellIndex)
         }
       }
+    }
+    function addMinimaxMove (event) {
+      addMove(event)
+      // there needs to be a time delay here
+      var bestMoveIndex = session.game.getBestMove()
+      session.game.board[bestMoveIndex] = session.game.currentPlayer
+      if (session.game.currentPlayer === 'o') drawNought(bestMoveIndex)
+      else drawCross(bestMoveIndex)
+      session.game.addMove(bestMoveIndex)
     }
   // Main body
     window.document.querySelector('.player-options').addEventListener('click', function (event) {

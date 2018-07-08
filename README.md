@@ -2,6 +2,12 @@
 Practice copying the SVG animation of Google's [Tic Tac Toe](https://www.google.com.sg/search?q=tic+tac+toe) with Minimax and 2-players implementation
 
 [View](https://codepen.io/sevresbabylone/full/BVvNPM/) on Codepen
+## Heuristic Board Evaluation Function
+- +100 for EACH 3-in-a-line for computer.
+- +10 for EACH two-in-a-line (with a empty cell) for computer.
+- +1 for EACH one-in-a-line (with two empty cells) for computer.
+- Negative scores for opponent, i.e., -100, -10, -1 for EACH opponent's 3-in-a-line, 2-in-a-line and 1-in-a-line.
+- 0 otherwise (empty lines or lines with both computer's and opponent's seeds).
 
 ## Alpha-beta pruning example
 Alpha-Beta pruning is an optimisation technique for the Minimax algorithm. It cuts off branches in the game tree which need not be searched because there exists already a better move available
