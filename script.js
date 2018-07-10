@@ -44,17 +44,17 @@
     var displayMessage = document.querySelector('.display-message')
     var drawMessage = document.querySelector('.draw-message')
     var fadeBoardTimeOutID
-    var session = new Session('1')
+    var session = new Session('2')
 
     function Session (mode) {
       this.mode = mode
       this.game = new Game(mode)
-      drawNewBoard()
+      drawNewBoard(this.game)
     }
     Session.prototype.startNewGame = function (mode) {
       this.mode = mode
       this.game = new Game(this.mode)
-      drawNewBoard()
+      drawNewBoard(this.game)
     }
     function Game (mode) {
       this.board = [null, null, null, null, null, null, null, null, null]
@@ -63,7 +63,7 @@
       this.currentNoOfTurns = 0
       this.isGameOver = false
     }
-    Game.INFINITY = 100000
+    // Functions that handle the non-physical board
     Game.prototype.addMove = function (cellIndex) {
       if (this.currentPlayer === 'x') {
         this.board[cellIndex] = 'x'
@@ -103,7 +103,7 @@
       return !this.board.includes(null)
     }
     Game.prototype.getBestMove = function () {
-
+      return this.minimax(2, true, 0).bestScoreIndex
     }
     Game.prototype.evaluate = function () {
      /* Heuristic evaluation function for the current board
@@ -111,6 +111,7 @@
       -100, -10, -1 for EACH 3-, 2-, 1-in-a-line for minimiser.
       0 otherwise */
       var self = this
+
       return LINES.reduce(function (score, LINE) {
         return score + self.evaluateLine(LINE)
       }, 0)
@@ -123,46 +124,68 @@
         -100, -10, -1 for 3-, 2-, 1-in-a-line for minimiser
         0 otherwise */
 
-      if (line[0] === 'o') score = 1 // o ? ? 1 in-a-line
-      else if (line[0] === 'x') score = -1 // x ? ? 1 in-a-line
+      if (this.board[line[0]] === 'o') score = 1 // o ? ? 1 in-a-line
+      else if (this.board[line[0]] === 'x') score = -1 // x ? ? 1 in-a-line
 
-      if (line[1] === 'o') {
+      if (this.board[line[1]] === 'o') {
         if (score === 1) score = 10 // o o ? 2 in-a-line
         else if (score === -1) return 0 // x o ?
         else score = 1 // - o ?
       }
-      if (line[1] === 'x') {
+      if (this.board[line[1]] === 'x') {
         if (score === -1) score = -10 // x x ? 2 in-a-line
         else if (score === 1) return 0 // o x ?
         else score = -1 // - x ?
       }
-      if (line[2] === 'o') {
+      if (this.board[line[2]] === 'o') {
         if (score > 0) score *= 10 //  - - o, o - o, - o o, o o o
-        if (score < 0) return 0 // x x o, o x o, - x o, x - o, x o o
+        else if (score < 0) return 0 // x x o, o x o, - x o, x - o, x o o
         else score = 1 // - - o
       }
-      if (line[2] === 'x') {
+      if (this.board[line[2]] === 'x') {
         if (score < 0) score *= 10
-        if (score > 0) return 0
+        else if (score > 0) return 0
         else score = -1 // - - x
       }
       return score
     }
 
+    // This function picks the bestIndex and bestScore
     Game.prototype.minimax = function (depth, isMaximisingPlayer) {
-      var bestScore = isMaximisingPlayer ? -this.INFINITY : this.INFINITY
-      var bestScoreIndex
-      if (this.isDraw() || this.checkWin().isWon || depth === 0) {
-        // base case: Game over or depth reached, evaluate score
+      var bestScore = isMaximisingPlayer ? -100000 : 100000
+      var bestScoreIndex = -1
+      var self = this
+      if (this.checkWin().isWon || this.isDraw() || depth === 0) {
+        // base case: Game over or depth reached, evaluate value of board
         bestScore = this.evaluate()
-      }
-      if (isMaximisingPlayer) {
-
       } else {
-
+        if (isMaximisingPlayer) {
+          this.board.forEach(function (cellValue, cellIndex) {
+            if (cellValue === null) {
+              self.board[cellIndex] = 'o'
+              var cell = self.minimax(depth - 1, false)
+              if (bestScore < cell.score) {
+                bestScore = cell.score
+                bestScoreIndex = cellIndex
+              }
+              self.board[cellIndex] = null
+            }
+          })
+        } else {
+          this.board.forEach(function (cellValue, cellIndex) {
+            if (cellValue === null) {
+              self.board[cellIndex] = 'x'
+              var cell = self.minimax(depth - 1, true)
+              if (bestScore > cell.score) {
+                bestScore = cell.score
+                bestScoreIndex = cellIndex
+              }
+              self.board[cellIndex] = null // undo move
+            }
+          })
+        }
       }
-      // undo move
-      return { bestScore: bestScore, bestScoreIndex: bestScoreIndex }
+      return { score: bestScore, bestScoreIndex: bestScoreIndex }
     }
 
   // Functions that handle SVG Animation
@@ -172,6 +195,8 @@
       ticTacToeCellTable.style.transform = ticTacToeCellTable.style.webkitTransform = null
       displayMessage.style.opacity = winnerMessage.style.opacity = drawMessage.style.opacity = '0'
       displayMessage.style.transform = displayMessage.style.webkitTransform = null
+      ticTacToeCellTable.removeEventListener('click', addMove)
+      ticTacToeCellTable.removeEventListener('click', addMinimaxMove)
       Array.prototype.forEach.call(cells, function (cell) {
         cell.style.opacity = null
         cell.style.webkitTransform = null
@@ -184,7 +209,7 @@
         resetsLine(line, '120')
         drawLine(line, '0')
       })
-      if (session.game.mode === '1') {
+      if (game.mode === '1') {
         ticTacToeCellTable.addEventListener('click', addMove)
       } else {
         ticTacToeCellTable.addEventListener('click', addMinimaxMove)
@@ -228,6 +253,8 @@
       }
     }
     function displayWinner (winningCombinationIndex) {
+      ticTacToeCellTable.removeEventListener('click', addMove)
+      ticTacToeCellTable.removeEventListener('click', addMinimaxMove)
       var winningCombination = WINNING_COMBINATIONS[winningCombinationIndex]
       displayStrikeThrough(winningCombinationIndex)
       var strikeThrough = document.getElementById('strikeThrough')
@@ -269,6 +296,8 @@
       }, 1500)
     }
     function displayDraw () {
+      ticTacToeCellTable.removeEventListener('click', addMove)
+      ticTacToeCellTable.removeEventListener('click', addMinimaxMove)
       fadeBoardTimeOutID = window.setTimeout(function () {
         scaleDownAndFade(ticTacToeGrid, true)
         scaleDownAndFade(ticTacToeCellTable, false)
@@ -358,73 +387,3 @@
     }, false)
   })
 })()
-
-//   function evaluate () {
-//     var winningCombinationIndex
-//     var isWon = WINNING_COMBINATIONS.some(function (combination, index) {
-//       winningCombinationIndex = index
-//       return board[combination[0]] === board[combination[1]] &&
-//              board[combination[1]] === board[combination[2]] &&
-//              board[combination[0]] !== null
-//     })
-//     if (isWon) {
-//
-//       if (board[WINNING_COMBINATIONS[winningCombinationIndex][0]] === 'o') {
-//         return 10
-//       }
-//       if (board[WINNING_COMBINATIONS[winningCombinationIndex][0]] === 'x') {
-//         return -10
-//       }
-//     }
-//     return 0
-//   }
-//   function minimax (depth, isMaximisingPlayer) {
-//     var score = evaluate()
-//     if (score === 10) return score - depth
-//     if (score === -10) return score + depth
-//     if (!board.includes(null)) return 0
-//     if (isMaximisingPlayer) {
-//       var maxValue = -10000
-//       board.forEach(function (cellValue, cellIndex) {
-//         if (cellValue === null) {
-//           board[cellIndex] = 'o'
-//           var cellScore = minimax(depth + 1, false)
-//           if (maxValue < cellScore) {
-//             maxValue = cellScore
-//           }
-//           board[cellIndex] = null
-//         }
-//       })
-//       return maxValue
-//     } else {
-//       var minValue = 10000
-//       board.forEach(function (cellValue, cellIndex) {
-//         if (cellValue === null) {
-//           board[cellIndex] = 'x'
-//           var cellScore = minimax(depth + 1, true)
-//           if (minValue > cellScore) {
-//             minValue = cellScore
-//           }
-//           board[cellIndex] = null
-//         }
-//       })
-//       return minValue
-//     }
-//   }
-//   function findBestMove () {
-//     var bestValue = -10000
-//     var bestCellIndex = null
-//     board.forEach(function (cellValue, cellIndex) {
-//       if (cellValue === null) {
-//         board[cellIndex] = 'o'
-//         var bestCellScore = minimax(0, false)
-//         if (bestValue < bestCellScore) {
-//           bestValue = bestCellScore
-//           bestCellIndex = cellIndex
-//         }
-//         board[cellIndex] = null
-//       }
-//     })
-//     return bestCellIndex
-//   }
-// }
